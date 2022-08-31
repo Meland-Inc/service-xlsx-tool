@@ -6,9 +6,9 @@ import (
 	"github.com/Meland-Inc/service-xlsx-tool/src/common/serviceLog"
 )
 
-func main() {
-	fmt.Println("this is meland service xlsx export tool.")
-	serviceLog.Init(10001, true)
+//-configdir /Users/44alex/work/meland/meland_svn_res/trunk/settings/config/xlsx
 
-	serviceLog.Error("这里是测试错误日志 ---------- ")
+func main() {
+	fmt.Println("--------------begin--------------")
+	serviceLog.Init(10001, true)
 }
