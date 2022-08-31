@@ -1,3 +1,3 @@
-module meland-game-xslx-tool
+module github.com/Meland-Inc/service-xlsx-tool
 
 go 1.17
