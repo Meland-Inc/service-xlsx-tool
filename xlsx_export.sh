@@ -10,9 +10,9 @@ set -e
 echo "------------  set xlsx tool environment variable --------------------------------"
 
 ## ---------------melandConfig----------------
-export MELAND_CONFIG_DB_HOST=127.0.0.1
+export MELAND_CONFIG_DB_HOST=192.168.50.15
 export MELAND_CONFIG_DB_USER=root
-export MELAND_CONFIG_DB_PASS=123456
+export MELAND_CONFIG_DB_PASS=root
 export MELAND_CONFIG_DB_PORT=3306
 export MELAND_CONFIG_DB_DATABASE=meland_cnf_dev
 
