@@ -34,6 +34,7 @@ func ExportXlsx() {
 
 func InitTables() {
 	RegisterTable("buff.xlsx", ParseBuff, CheckBuff, SaveBuffToDB)
+	RegisterTable("Chat.xlsx", ParseChat, CheckChat, ChatSaveToDB)
 }
 
 func ParseTables(configDir string) (err error) {
