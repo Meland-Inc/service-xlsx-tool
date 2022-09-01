@@ -19,7 +19,7 @@ type XlsxParse struct {
 	SheetName   string
 	ParseSheetF ParseSheetFunc
 	CheckF      func() error
-	WriteF      func(db *gorm.DB, curSecUtc time.Time) error
+	WriteF      func(db *gorm.DB, curSecUtc time.Time)
 }
 
 var parseTables = make([]XlsxParse, 0, 0)
@@ -32,7 +32,7 @@ func RegisterTable(
 	tableName string,
 	parseF ParseSheetFunc,
 	checkF func() error,
-	writeF func(db *gorm.DB, curSecUtc time.Time) error,
+	writeF func(db *gorm.DB, curSecUtc time.Time),
 ) {
 	if tableName == "" || parseF == nil {
 		panic("invalid tableName || parseF  is nill")

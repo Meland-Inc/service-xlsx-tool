@@ -1,6 +1,7 @@
 package xlsx_export
 
 import (
+	xlsxTable "game-message-core/xlsxTableData"
 	"os"
 	"time"
 
@@ -20,6 +21,11 @@ func ExportXlsx() {
 		panic(err)
 	}
 
+	err = CheckTablesError()
+	if err != nil {
+		panic(err)
+	}
+
 	err = SaveToDB()
 	if err != nil {
 		panic(err)
@@ -27,7 +33,17 @@ func ExportXlsx() {
 }
 
 func InitTables() {
-	// RegisterTable("",)
+	RegisterTable("buff.xlsx", ParseBuff, CheckBuff, SaveBuffToDB)
+	RegisterTable("Chat.xlsx", ParseChat, CheckChat, ChatSaveToDB)
+	RegisterTable("Drop.xlsx", ParseDrop, CheckDrop, DropSaveToDB)
+	RegisterTable("Item.xlsx", ParseItem, nil, ItemSaveToDB)
+	RegisterTable("GameValue.xlsx", ParseGameValue, nil, GameValueSaveToDB)
+	RegisterTable("Monster.xlsx", ParseMonster, CheckMonster, MonsterSaveToDB)
+	RegisterTable("Reward.xlsx", ParseReward, CheckReward, RewardSaveToDB)
+	RegisterTable("RoleLv.xlsx", ParseRoleLv, nil, RoleLvSaveToDB)
+	RegisterTable("SlotLv.xlsx", ParseSlotLv, nil, SlotLvSaveToDB)
+	RegisterTable("Task.xlsx", ParseTask, nil, TaskSaveToDB)
+	RegisterTable("TaskList.xlsx", ParseTaskList, nil, TaskListSaveToDB)
 }
 
 func ParseTables(configDir string) (err error) {
@@ -69,7 +85,7 @@ func CheckTablesError() (err error) {
 }
 
 func SaveToDB() (err error) {
-	db, err := GetTableDB(nil) // TODO ... XLSX DATA MODULE
+	db, err := GetTableDB(xlsxTable.TableModels())
 	if err != nil {
 		serviceLog.Error(err.Error())
 		return err
@@ -80,11 +96,7 @@ func SaveToDB() (err error) {
 		if parse.WriteF == nil {
 			continue
 		}
-
-		if writeErr := parse.WriteF(db, curUtc); writeErr != nil {
-			err = writeErr
-			serviceLog.Error(err.Error())
-		}
+		parse.WriteF(db, curUtc)
 	}
 	return err
 }
