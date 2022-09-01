@@ -37,6 +37,7 @@ func InitTables() {
 	RegisterTable("Chat.xlsx", ParseChat, CheckChat, ChatSaveToDB)
 	RegisterTable("Drop.xlsx", ParseDrop, CheckDrop, DropSaveToDB)
 	RegisterTable("Item.xlsx", ParseItem, nil, ItemSaveToDB)
+	RegisterTable("GameValue.xlsx", ParseGameValue, nil, GameValueSaveToDB)
 }
 
 func ParseTables(configDir string) (err error) {
