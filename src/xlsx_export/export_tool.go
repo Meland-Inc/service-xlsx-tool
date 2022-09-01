@@ -34,6 +34,10 @@ func RegisterTable(
 	checkF func() error,
 	writeF func(db *gorm.DB, curSecUtc time.Time) error,
 ) {
+	if tableName == "" || parseF == nil {
+		panic("invalid tableName || parseF  is nill")
+	}
+
 	parseTables = append(parseTables, XlsxParse{
 		TableName:   tableName,
 		ParseSheetF: parseF,

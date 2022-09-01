@@ -56,6 +56,10 @@ func ParseTables(configDir string) (err error) {
 
 func CheckTablesError() (err error) {
 	for _, parse := range GetParseTables() {
+		if parse.CheckF == nil {
+			continue
+		}
+
 		if checkErr := parse.CheckF(); checkErr != nil {
 			err = checkErr
 			serviceLog.Error(err.Error())
@@ -73,6 +77,10 @@ func SaveToDB() (err error) {
 
 	curUtc := time.Now().UTC()
 	for _, parse := range GetParseTables() {
+		if parse.WriteF == nil {
+			continue
+		}
+
 		if writeErr := parse.WriteF(db, curUtc); writeErr != nil {
 			err = writeErr
 			serviceLog.Error(err.Error())
