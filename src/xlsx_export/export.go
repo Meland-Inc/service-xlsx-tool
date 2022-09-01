@@ -1,6 +1,7 @@
 package xlsx_export
 
 import (
+	xlsxTable "game-message-core/xlsxTableData"
 	"os"
 	"time"
 
@@ -20,6 +21,11 @@ func ExportXlsx() {
 		panic(err)
 	}
 
+	err = CheckTablesError()
+	if err != nil {
+		panic(err)
+	}
+
 	err = SaveToDB()
 	if err != nil {
 		panic(err)
@@ -27,7 +33,7 @@ func ExportXlsx() {
 }
 
 func InitTables() {
-	// RegisterTable("",)
+	RegisterTable("buff.xlsx", ParseBuff, CheckBuff, SaveBuffToDB)
 }
 
 func ParseTables(configDir string) (err error) {
@@ -69,7 +75,7 @@ func CheckTablesError() (err error) {
 }
 
 func SaveToDB() (err error) {
-	db, err := GetTableDB(nil) // TODO ... XLSX DATA MODULE
+	db, err := GetTableDB(xlsxTable.TableModels())
 	if err != nil {
 		serviceLog.Error(err.Error())
 		return err
@@ -80,11 +86,7 @@ func SaveToDB() (err error) {
 		if parse.WriteF == nil {
 			continue
 		}
-
-		if writeErr := parse.WriteF(db, curUtc); writeErr != nil {
-			err = writeErr
-			serviceLog.Error(err.Error())
-		}
+		parse.WriteF(db, curUtc)
 	}
 	return err
 }
