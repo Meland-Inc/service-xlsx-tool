@@ -138,7 +138,7 @@ func ParseTask(rows []map[string]interface{}) (err error) {
 		taskTableRows[setting.Id] = setting
 	}
 
-	return nil
+	return err
 }
 
 func TaskSaveToDB(db *gorm.DB, curSecUtc time.Time) {
