@@ -2,10 +2,10 @@
 set -e
 
 
-
 # git checkout .
 # git checkout main
 # git pull
+# git submodule update --init --recursive
 
 echo "------------  set xlsx tool environment variable --------------------------------"
 
