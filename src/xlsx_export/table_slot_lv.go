@@ -19,6 +19,7 @@ func ParseSlotLv(rows []map[string]interface{}) (err error) {
 			continue
 		}
 		setting := xlsxTable.SlotLvTableRow{
+			Id:         excel.IntToInt32(row["id"]),
 			Position:   excel.IntToInt32(row["slot"]),
 			Lv:         excel.IntToInt32(row["lv"]),
 			UpExp:      excel.IntToInt32(row["exp"]),
@@ -35,7 +36,7 @@ func ParseSlotLv(rows []map[string]interface{}) (err error) {
 			MoveSpeed:  excel.IntToInt32(row["moveSpeed"]),
 		}
 
-		SlotLvTableRows[setting.Lv] = setting
+		SlotLvTableRows[setting.Id] = setting
 	}
 
 	return nil
