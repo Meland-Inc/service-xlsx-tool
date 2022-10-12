@@ -22,53 +22,79 @@ func ParseReward(rows []map[string]interface{}) (err error) {
 		}
 		setting := xlsxTable.RewardTableRow{
 			RewardId: excel.IntToInt32(row["id"]),
-			Exp:      excel.IntToInt32(row["exp"]),
 		}
 
-		num := 20
-		str := ""
-
-		rewardList := xlsxTable.RewardItemList{}
-		for i := 1; i <= num; i++ {
-			str = fmt.Sprintf("item%dObjectId", i)
-			val, ok := row[str]
-			if !ok {
-				continue
-			}
-
-			itemId := excel.IntToInt32(val)
-			if 0 == itemId {
-				continue
-			}
-
-			str = fmt.Sprintf("item%dQuality", i)
-			val, ok = row[str]
-			if !ok {
-				serviceLog.Error("rewardId(%d) 物品(%d)没有配置数量", setting.RewardId, i)
-				continue
-			}
-
-			itemNum := excel.IntToInt32(val)
-			rewardList.List = append(rewardList.List, xlsxTable.RewardItem{
-				Cid:      itemId,
-				Quantity: itemNum,
-			})
+		// load reward times
+		timeData, ok := row["rewardTimes"].([][]int)
+		if !ok {
+			err = fmt.Errorf(" reward.xlsx  rewardTimes  not match to [][]int")
+			serviceLog.Error(err.Error())
+			continue
 		}
-		setting.SetRewardList(rewardList)
+		if len(timeData) < 1 {
+			err = fmt.Errorf(" reward.xlsx  rewardTimes   data invalid")
+			serviceLog.Error(err.Error())
+			continue
+		}
+
+		rewardTimeList := xlsxTable.RewardTimeList{}
+		for _, v := range timeData {
+			if len(v) < 2 {
+				err = fmt.Errorf(" reward.xlsx rewardTimes data invalid")
+				serviceLog.Error(err.Error())
+				continue
+			}
+			rewardTime := xlsxTable.RewardTime{
+				Time:   int32(v[0]),
+				Weight: int32(v[1]),
+			}
+			rewardTimeList.TotalWeight += rewardTime.Weight
+			rewardTimeList.RewardTimes = append(rewardTimeList.RewardTimes, rewardTime)
+		}
+		setting.SetRewardTimeList(rewardTimeList)
+
+		// load reward items
+		// 4010001,1,1,100;
+		// cid,品质(指定),数量(指定),权重
+		rewardItems, ok := row["rewardList"].([][]int)
+		if !ok {
+			err = fmt.Errorf(" reward.xlsx  rewardList  not match to [][]int")
+			serviceLog.Error(err.Error())
+			continue
+		}
+
+		rewardItemList := xlsxTable.RewardItemList{}
+		for _, v := range rewardItems {
+			if len(v) < 4 {
+				err = fmt.Errorf(" reward.xlsx rewardList data invalid")
+				serviceLog.Error(err.Error())
+				continue
+			}
+			rewardItem := xlsxTable.RewardItem{
+				Cid:      int32(v[0]),
+				Quantity: int32(v[1]),
+				Num:      int32(v[2]),
+				Weight:   int32(v[3]),
+			}
+			rewardItemList.TotalWeight += rewardItem.Weight
+			rewardItemList.Rewards = append(rewardItemList.Rewards, rewardItem)
+		}
+		setting.SetRewardList(rewardItemList)
+
 		rewardTableRows[setting.RewardId] = setting
 	}
 
-	return nil
+	return err
 }
 
 func CheckReward() (err error) {
 	for _, row := range rewardTableRows {
 		rewardList, _ := row.GetRewardList()
-		if rewardList == nil || len(rewardList.List) < 1 {
+		if rewardList == nil || len(rewardList.Rewards) < 1 {
 			continue
 		}
 
-		for _, reward := range rewardList.List {
+		for _, reward := range rewardList.Rewards {
 			if 0 == reward.Cid {
 				continue
 			}

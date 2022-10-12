@@ -46,6 +46,7 @@ func ParseTaskList(rows []map[string]interface{}) (err error) {
 			Level:         excel.IntToInt32(row["level"]),
 			System:        excel.IntToInt32(row["system"]),
 			RewardExp:     excel.IntToInt32(row["expReward"]),
+			RewardId:      excel.IntToInt32(row["itemReward"]),
 			ProgressReset: excel.IntToInt32(row["progressReset"]) == 1,
 			NeedMELD:      excel.IntToInt32(row["costMELD"]),
 		}
@@ -62,16 +63,6 @@ func ParseTaskList(rows []map[string]interface{}) (err error) {
 			}
 		} else {
 			err = fmt.Errorf(" taskList.xlsx invalid item taskId[%v]", setting.Id)
-			serviceLog.Error(err.Error())
-			continue
-		}
-
-		if objs, err := ParseTaskRewardItem(excel.IntToInt32(row["itemReward"])); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetRewardItems(objs)
-			}
-		} else {
-			err = fmt.Errorf(" taskList.xlsx invalid reward taskId[%v]", setting.Id)
 			serviceLog.Error(err.Error())
 			continue
 		}
