@@ -15,28 +15,6 @@ import (
 
 var taskTableRows = make(map[int32]xlsxTable.TaskTableRow)
 
-func ParseTaskRewardItem(rewardId int32) (objs *xlsxTable.TaskObjectList, err error) {
-	objs = &xlsxTable.TaskObjectList{}
-	if rewardId < 1 {
-		return objs, nil
-	}
-	if drop, exist := dropTableRows[rewardId]; exist {
-		dropList, err := drop.GetDropList()
-		if err != nil {
-			return nil, err
-		}
-		for _, dropData := range dropList.List {
-			objs.ChanceSum += dropData.Possibility
-			objs.ParamList = append(objs.ParamList, xlsxTable.TaskObject{
-				Param1: dropData.ObjectCid,
-				Param2: dropData.Possibility,
-				Param3: dropData.Quality,
-			})
-		}
-	}
-	return
-}
-
 func ParseTaskParams(v interface{}) (objs *xlsxTable.TaskObjectList, err error) {
 	iss, ok := v.([][]int)
 	if !ok {
@@ -72,6 +50,7 @@ func ParseTask(rows []map[string]interface{}) (err error) {
 			Kind:        excel.IntToInt32(row["Type"]),
 			RequestLand: excel.IntToInt32(row["requestLand"]),
 			RewardExp:   excel.IntToInt32(row["expReward"]),
+			RewardId:    excel.IntToInt32(row["itemReward"]),
 			Difficulty:  excel.IntToInt32(row["difficulty"]),
 		}
 
@@ -118,16 +97,6 @@ func ParseTask(rows []map[string]interface{}) (err error) {
 		if objs, err := ParseTaskParams(row["quiz"]); err == nil {
 			if len(objs.ParamList) > 0 {
 				setting.SetQuiz(objs)
-			}
-		} else {
-			err = fmt.Errorf(" task.xlsx invalid quiz taskId[%v]", setting.Id)
-			serviceLog.Error(err.Error())
-			continue
-		}
-
-		if objs, err := ParseTaskRewardItem(excel.IntToInt32(row["itemReward"])); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetRewardItems(objs)
 			}
 		} else {
 			err = fmt.Errorf(" task.xlsx invalid quiz taskId[%v]", setting.Id)

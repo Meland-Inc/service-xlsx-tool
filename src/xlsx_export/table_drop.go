@@ -24,10 +24,11 @@ func ParseDrop(rows []map[string]interface{}) (err error) {
 		setting := xlsxTable.DropTableRow{
 			DropId: excel.IntToInt32(row["id"]),
 		}
-		// 61000029,3000,1;61000025,5000,1;61000030,1000,1;71010002,120,1
+
+		// 1010001,	   1,		1,		20;
+		// cid,		品质(指定),数量(指定) 万份比例,
 
 		dropList := xlsxTable.DropList{}
-
 		dropData, ok := row["dropList"].([][]int)
 		if !ok {
 			err = fmt.Errorf(" Drop.xlsx  dropList  not match to [][]int")
@@ -36,26 +37,19 @@ func ParseDrop(rows []map[string]interface{}) (err error) {
 		}
 
 		for _, drop := range dropData {
-			if len(drop) < 3 {
+			if len(drop) < 4 {
 				err = fmt.Errorf(" Drop.xlsx  id[%v] dropList 配置错误", setting.DropId)
 				serviceLog.Error(err.Error())
 				continue
 			}
-			cid := int32(drop[0])
-			poss := int32(drop[1])
-			quality := int32(drop[2])
-			if cid < 1 || poss < 1 || quality < 1 {
-				err = fmt.Errorf(" Drop.xlsx  dropId[%v]  dropList data is invalid", setting.DropId)
-				serviceLog.Error(err.Error())
-				continue
+			dropData := xlsxTable.DropData{
+				Cid:         int32(drop[0]),
+				Quality:     int32(drop[1]),
+				Num:         int32(drop[2]),
+				Possibility: int32(drop[3]),
 			}
 
-			dropList.List = append(dropList.List, xlsxTable.DropData{
-				ObjectCid:   cid,
-				Num:         1,
-				Possibility: poss,
-				Quality:     quality,
-			})
+			dropList.List = append(dropList.List, dropData)
 		}
 
 		setting.SetDropList(dropList)
@@ -75,14 +69,14 @@ func CheckDrop() (err error) {
 		}
 
 		for _, drop := range dropList.List {
-			if drop.Num < 1 || drop.ObjectCid < 1 {
+			if drop.Num < 1 || drop.Cid < 1 || drop.Possibility < 1 || drop.Quality < 1 {
 				err = fmt.Errorf(" Drop.xlsx  dropId[%v]  drop data [%v]is invalid", row.DropId, drop)
 				serviceLog.Error(err.Error())
 				continue
 			}
 
-			if _, exist := itemTableRows[drop.ObjectCid]; !exist {
-				err = fmt.Errorf(" Drop.xlsx  dropId[%v]  drop item[%d] not found", row.DropId, drop.ObjectCid)
+			if _, exist := itemTableRows[drop.Cid]; !exist {
+				err = fmt.Errorf(" Drop.xlsx  dropId[%v]  drop item[%d] not found", row.DropId, drop.Cid)
 				serviceLog.Error(err.Error())
 			}
 		}
