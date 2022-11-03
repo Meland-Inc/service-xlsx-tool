@@ -19,3 +19,10 @@ xlsx data export tool used by Meland services
 ## tool running parameter
 
 + please see xlsx_export.sh
+
+---
+
+## make task table
+
++ 1. fix file "src/xlsx_make/task_xlsx_data.go"
++ 2. run "bash ./xlsx_make.sh"
