@@ -115,7 +115,7 @@ func MakeTask2000N() {
 }
 
 func MakeTask3000N() {
-	idBegin, idEnd := int32(30001), int32(30003)
+	idBegin, idEnd := int32(30001), int32(30004)
 
 	rowOptions := make(map[int32][]xlsxTable.TaskXlsxRowOption)
 	rowOptions[30001] = []xlsxTable.TaskXlsxRowOption{
@@ -132,6 +132,7 @@ func MakeTask3000N() {
 			Value:      "1010002,1,100;1010003,1,100;1010004,1,100;1010005,1,100;1010006,1,100;3010101,1,5000;3010201,1,5000",
 		},
 	}
+	rowOptions[30004] = rowOptions[30003]
 
 	for id := idBegin; id <= idEnd; id++ {
 		row := data.TaskXlsxRow{

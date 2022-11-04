@@ -1,6 +1,7 @@
 package xlsx_export
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -15,23 +16,22 @@ import (
 
 var taskListTableRows = make(map[int32]xlsxTable.TaskListTableRow)
 
-func ParseTaskListParams(v interface{}) (objs *xlsxTable.TaskObjectList, err error) {
+func ParseTaskListParams(v interface{}) (include *xlsxTable.TaskListTableIncludeTasks, err error) {
 	iss, ok := v.([][]int)
 	if !ok {
-		return &xlsxTable.TaskObjectList{}, nil
+		return nil, errors.New("invalid task list parameters")
 	}
-
-	objs = &xlsxTable.TaskObjectList{}
+	include = &xlsxTable.TaskListTableIncludeTasks{}
 	for _, is := range iss {
 		if len(is) < 2 {
-			return nil, fmt.Errorf("invalid data")
+			return include, fmt.Errorf("invalid task list parameters data")
 		}
-		paramList := xlsxTable.TaskObject{
-			Param1: int32(is[0]),
-			Param2: int32(is[1]),
+		param := xlsxTable.TaskListTableParam{
+			TaskId: int32(is[0]),
+			Chance: int32(is[1]),
 		}
-		objs.ParamList = append(objs.ParamList, paramList)
-		objs.ChanceSum += paramList.Param2
+		include.Param = append(include.Param, param)
+		include.ChanceSum += param.Chance
 	}
 	return
 }
@@ -51,15 +51,16 @@ func ParseTaskList(rows []map[string]interface{}) (err error) {
 			NeedMELD:      excel.IntToInt32(row["costMELD"]),
 		}
 
-		if objs, err := ParseTaskListParams(row["includeTask"]); err == nil {
-			for _, v := range objs.ParamList {
-				if _, exist := taskTableRows[v.Param1]; !exist {
-					err = fmt.Errorf(" taskList.xlsx Id[%v], include invalid task id [%v]  ", setting.Id, v.Param1)
+		include, err := ParseTaskListParams(row["includeTask"])
+		if err == nil {
+			for _, v := range include.Param {
+				if _, exist := taskTableRows[v.TaskId]; !exist {
+					err = fmt.Errorf(" taskList.xlsx Id[%v], include invalid task id [%v]  ", setting.Id, v.TaskId)
 					serviceLog.Error(err.Error())
 				}
 			}
-			if len(objs.ParamList) > 0 {
-				setting.SetIncludeTask(objs)
+			if len(include.Param) > 0 {
+				setting.SetIncludeTask(include)
 			}
 		} else {
 			err = fmt.Errorf(" taskList.xlsx invalid item taskId[%v]", setting.Id)
