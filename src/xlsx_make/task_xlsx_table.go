@@ -93,29 +93,116 @@ func MakeTaskXlsxData() {
 }
 
 func MakeTask1000N() {
-	idBegin, idEnd := int32(10001), int32(10003)
+	idBegin, idEnd := int32(10001), int32(10016)
 
 	// 固定的任务项
 	designateOptions := make(map[int32][]xlsxTable.TaskXlsxOption)
 	designateOptions[10001] = []xlsxTable.TaskXlsxOption{
 		{
-			OptionType: proto.TaskOptionType_RecipeUseCount,
+			OptionType: proto.TaskOptionType_KillMonster,
+			Value:      "1000001,3",
+		},
+	}
+	designateOptions[10002] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UseItem,
+			Value:      "3010101,1",
+		},
+	}
+	designateOptions[10003] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UserLevel,
+			Value:      "2",
+		},
+	}
+	designateOptions[10004] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_KillMonster,
+			Value:      "1000001,10",
+		},
+	}
+	designateOptions[10005] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_HandInItem,
+			Value:      "4020001,3",
+		},
+	}
+	designateOptions[10006] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UseRecipe,
+			Value:      "10301006,1",
+		},
+	}
+	designateOptions[10007] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_KillMonster,
+			Value:      "1000002,10",
+		},
+	}
+	designateOptions[10008] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_SlotLevelCount,
+			Value:      "2,4",
+		},
+	}
+	designateOptions[10009] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UseRecipe,
+			Value:      "10301002,1",
+		},
+	}
+	designateOptions[10010] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_KillMonster,
+			Value:      "1000003,10",
+		},
+	}
+	designateOptions[10011] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UserLevel,
 			Value:      "5",
 		},
 	}
-	designateOptions[10002] = designateOptions[10001]
-	designateOptions[10003] = designateOptions[10001]
-
-	// 按权重随机的任务项
-	chanceOptions := make(map[int32][]xlsxTable.TaskXlsxOption)
-	chanceOptions[10001] = []xlsxTable.TaskXlsxOption{
+	designateOptions[10012] = []xlsxTable.TaskXlsxOption{
 		{
 			OptionType: proto.TaskOptionType_KillMonster,
-			Value:      "9900002,1,200;9900003,1,200;9900004,1,600", // cid, num,权重; cid,num，权重;...
+			Value:      "1000004,10",
 		},
 	}
-	chanceOptions[10002] = chanceOptions[10001]
-	chanceOptions[10003] = chanceOptions[10001]
+	designateOptions[10013] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_SlotLevelCount,
+			Value:      "3,4",
+		},
+	}
+	designateOptions[10014] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UserLevel,
+			Value:      "8",
+		},
+	}
+	designateOptions[10015] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_UseRecipe,
+			Value:      "10200001,10",
+		},
+	}
+	designateOptions[10016] = []xlsxTable.TaskXlsxOption{
+		{
+			OptionType: proto.TaskOptionType_KillMonster,
+			Value:      "1000005,1",
+		},
+	}
+	// 按权重随机的任务项
+	chanceOptions := make(map[int32][]xlsxTable.TaskXlsxOption)
+	// chanceOptions[10001] = []xlsxTable.TaskXlsxOption{
+	// 	{
+	// 		OptionType: proto.TaskOptionType_KillMonster,
+	// 		Value:      "9900002,1,200;9900003,1,200;9900004,1,600", // cid, num,权重; cid,num，权重;...
+	// 	},
+	// }
+	// chanceOptions[10002] = chanceOptions[10001]
+	// chanceOptions[10003] = chanceOptions[10001]
 
 	for id := idBegin; id <= idEnd; id++ {
 		row := data.TaskXlsxRow{
