@@ -58,10 +58,16 @@ import (
 		Value:      "20001,3;20002,2", //合成技能id,等级;合成技能id,等级;....
 	},
 
-	TaskOptionType_RecipeUse				// 使用指定的配方合成
+	TaskOptionType_RecipeUse			// 使用指定的配方合成
 	{
 		OptionType: proto.TaskOptionType_RecipeUse,
 		Value:      "20001,3;20002,2", //配方id,次数;配方id,次数;.....
+	},
+
+	TaskOptionType_RecipeUseCount		// 累计合成多少次
+	{
+		OptionType: proto.TaskOptionType_RecipeUseCount,
+		Value:      "10", //次数
 	},
 
 	TaskOptionType_TaskListTypeCount	   // 完成若干数量的指定类型任务链
@@ -93,8 +99,8 @@ func MakeTask1000N() {
 	designateOptions := make(map[int32][]xlsxTable.TaskXlsxRowOption)
 	designateOptions[10001] = []xlsxTable.TaskXlsxRowOption{
 		{
-			OptionType: proto.TaskOptionType_TargetPosition,
-			Value:      "111,111,3000;222,222,3000;333,333,4000",
+			OptionType: proto.TaskOptionType_RecipeUseCount,
+			Value:      "5",
 		},
 	}
 	designateOptions[10002] = designateOptions[10001]
