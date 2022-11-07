@@ -14,17 +14,17 @@ var TaskXlsxFileHeader = [][]string{
 }
 
 type TaskXlsxRow struct {
-	Id               int32                         `json:"id"`
-	Level            int32                         `json:"level"`
-	Name             string                        `json:"name"`
-	Decs             string                        `json:"decs"`
-	Details          string                        `json:"details"`
-	SubSystem        string                        `json:"subSystem"`
-	ItemReward       int32                         `json:"itemReward"`
-	ExpReward        int32                         `json:"expReward"`
-	Difficulty       int32                         `json:"difficulty"`
-	DesignateOptions []xlsxTable.TaskXlsxRowOption `json:"-"`
-	ChanceOptions    []xlsxTable.TaskXlsxRowOption `json:"-"`
+	Id               int32                      `json:"id"`
+	Level            int32                      `json:"level"`
+	Name             string                     `json:"name"`
+	Decs             string                     `json:"decs"`
+	Details          string                     `json:"details"`
+	SubSystem        string                     `json:"subSystem"`
+	ItemReward       int32                      `json:"itemReward"`
+	ExpReward        int32                      `json:"expReward"`
+	Difficulty       int32                      `json:"difficulty"`
+	DesignateOptions []xlsxTable.TaskXlsxOption `json:"-"`
+	ChanceOptions    []xlsxTable.TaskXlsxOption `json:"-"`
 }
 
 func (p *TaskXlsxRow) GetDesignateOptions() string {

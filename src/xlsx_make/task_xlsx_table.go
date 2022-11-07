@@ -58,7 +58,7 @@ import (
 		Value:      "20001,3;20002,2", //合成技能id,等级;合成技能id,等级;....
 	},
 
-	TaskOptionType_RecipeUse			// 使用指定的配方合成
+	TaskOptionType_UseRecipe			// 使用指定的配方合成
 	{
 		OptionType: proto.TaskOptionType_RecipeUse,
 		Value:      "20001,3;20002,2", //配方id,次数;配方id,次数;.....
@@ -96,8 +96,8 @@ func MakeTask1000N() {
 	idBegin, idEnd := int32(10001), int32(10003)
 
 	// 固定的任务项
-	designateOptions := make(map[int32][]xlsxTable.TaskXlsxRowOption)
-	designateOptions[10001] = []xlsxTable.TaskXlsxRowOption{
+	designateOptions := make(map[int32][]xlsxTable.TaskXlsxOption)
+	designateOptions[10001] = []xlsxTable.TaskXlsxOption{
 		{
 			OptionType: proto.TaskOptionType_RecipeUseCount,
 			Value:      "5",
@@ -107,8 +107,8 @@ func MakeTask1000N() {
 	designateOptions[10003] = designateOptions[10001]
 
 	// 按权重随机的任务项
-	chanceOptions := make(map[int32][]xlsxTable.TaskXlsxRowOption)
-	chanceOptions[10001] = []xlsxTable.TaskXlsxRowOption{
+	chanceOptions := make(map[int32][]xlsxTable.TaskXlsxOption)
+	chanceOptions[10001] = []xlsxTable.TaskXlsxOption{
 		{
 			OptionType: proto.TaskOptionType_KillMonster,
 			Value:      "9900002,1,200;9900003,1,200;9900004,1,600", // cid, num,权重; cid,num，权重;...
