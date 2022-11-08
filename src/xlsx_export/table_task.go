@@ -93,6 +93,14 @@ func intArrToTaskRowOption(optType proto.TaskOptionType, arr []int, isChance boo
 }
 
 func ParseTaskOptionsJson(id int32, js string, isChance bool) (optionList *xlsxTable.TaskRowOptionList, err error) {
+	if len(js) == 0 {
+		return nil, nil
+	}
+
+	if id < 1 {
+		return nil, fmt.Errorf("invalid task id[%d]", id)
+	}
+
 	xlsxOptions := &xlsxTable.TaskXlsxOptions{}
 	err = json.Unmarshal([]byte(js), xlsxOptions)
 	if err != nil {

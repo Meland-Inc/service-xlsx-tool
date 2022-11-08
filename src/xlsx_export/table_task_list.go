@@ -16,16 +16,18 @@ import (
 
 var taskListTableRows = make(map[int32]xlsxTable.TaskListTableRow)
 
-func ParseTaskListTaskPool(v interface{}) (pools *xlsxTable.TaskListTableTaskPool, err error) {
+func ParseTaskListTaskPool(v interface{}) (pools xlsxTable.TaskListTableTaskPool, err error) {
 	iss, ok := v.([][]int)
 	if !ok {
-		return nil, errors.New("invalid task list task pool")
+		return pools, errors.New("invalid task list task pool")
+	}
+	if len(iss) < 1 {
+		return pools, nil
 	}
 
-	pools = &xlsxTable.TaskListTableTaskPool{}
 	for _, is := range iss {
 		if len(is) < 2 {
-			return pools, fmt.Errorf("invalid task list parameters data")
+			return pools, fmt.Errorf("invalid task list task Pool data")
 		}
 		param := xlsxTable.TaskPoolParam{
 			TaskId: int32(is[0]),
@@ -37,9 +39,8 @@ func ParseTaskListTaskPool(v interface{}) (pools *xlsxTable.TaskListTableTaskPoo
 	return
 }
 
-func ParseTaskListSequence(v interface{}) (seq *xlsxTable.TaskListTableTaskSequence) {
-	is := excel.IntSliceToInt32Slice(v)
-	seq = &xlsxTable.TaskListTableTaskSequence{Sequence: is}
+func ParseTaskListSequence(v interface{}) (seq xlsxTable.TaskListTableTaskSequence) {
+	seq.Sequence = excel.IntSliceToInt32Slice(v)
 	return
 }
 
@@ -62,12 +63,12 @@ func ParseTaskList(rows []map[string]interface{}) (err error) {
 		if err == nil {
 			for _, v := range taskPools.Param {
 				if _, exist := taskTableRows[v.TaskId]; !exist {
-					err = fmt.Errorf(" taskList.xlsx Id[%v], include invalid task id [%v]  ", setting.Id, v.TaskId)
+					err = fmt.Errorf(" taskList.xlsx Id[%v], taskPool invalid task id [%v]  ", setting.Id, v.TaskId)
 					serviceLog.Error(err.Error())
 				}
 			}
 			if len(taskPools.Param) > 0 {
-				setting.SetTaskPool(taskPools)
+				setting.SetTaskPool(&taskPools)
 			}
 		} else {
 			err = fmt.Errorf(" taskList.xlsx invalid item Id[%v]", setting.Id)
@@ -76,12 +77,20 @@ func ParseTaskList(rows []map[string]interface{}) (err error) {
 		}
 
 		seq := ParseTaskListSequence(row["taskSequence"])
-		if len(seq.Sequence) == 0 && len(taskPools.Param) == 0 {
-			err = fmt.Errorf(" taskList.xlsx [%d] taskPool && taskSequence is empty", setting.Id)
+		for _, taskId := range seq.Sequence {
+			if _, exist := taskTableRows[taskId]; !exist {
+				err = fmt.Errorf(" taskList.xlsx Id[%v], taskSequence invalid task id [%v]  ", setting.Id, taskId)
+				serviceLog.Error(err.Error())
+			}
+		}
+		if len(seq.Sequence) > 0 {
+			setting.SetSequence(&seq)
+		}
+		if err = setting.Check(); err != nil {
 			serviceLog.Error(err.Error())
 			continue
 		}
-		setting.SetSequence(seq)
+
 		taskListTableRows[setting.Id] = setting
 	}
 
