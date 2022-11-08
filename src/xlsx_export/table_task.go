@@ -76,7 +76,7 @@ func intArrToTaskRowOption(optType proto.TaskOptionType, arr []int, isChance boo
 		// 累计合成多少次 "10", //次数
 		opt.Param1 = int32(arr[0])
 
-	case proto.TaskOptionType_TaskTypeCount:
+	case proto.TaskOptionType_TaskListTypeCount:
 		// 完成若干数量的指定类型任务链 "1,3;2,2", //任务链类型,数量;任务链类型,数量;.....
 		opt.Param1 = int32(arr[0])
 		opt.Param2 = int32(arr[1])
