@@ -20,9 +20,9 @@ import (
 		Value:      "1010001,1;1010002,1;1010003,1;1010004,1", // id,num;id,num;...
 	},
 
-	TaskOptionType_PickUpItem   			// 获得若干数量的指定道具
+	TaskOptionType_GetItem   			// 获得若干数量的指定道具
 	{
-		OptionType: proto.TaskOptionType_PickUpItem,
+		OptionType: proto.TaskOptionType_GetItem,
 		Value:      "1010001,1;1010002,1;1010003,1;1010004,1", // id,num;id,num;...
 	},
 
@@ -68,10 +68,16 @@ import (
 		Value:      "10", //次数
 	},
 
+	TaskOptionType_TaskCount	   // 完成若干次指定任务链的任务
+	{
+		OptionType: proto.TaskOptionType_TaskCount,
+		Value:      "1,3;2,1", //任务链类型,完成次数;任务链类型,完成次数;.....
+	},
+
 	TaskOptionType_TaskListTypeCount	   // 完成若干数量的指定类型任务链
 	{
 		OptionType: proto.TaskOptionType_TaskTypeCount,
-		Value:      "1,3;2,2", //任务链类型,数量;任务链类型,数量;.....
+		Value:      "1,3;2,2", //任务链类型,完成次数;任务链类型,完成次数;.....
 	},
 
 	TaskOptionType_TargetPosition			// 到达指定坐标点指定半径范围内的区域
