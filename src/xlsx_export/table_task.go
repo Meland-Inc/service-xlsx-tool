@@ -1,9 +1,11 @@
 package xlsx_export
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"game-message-core/proto"
 	xlsxTable "game-message-core/xlsxTableData"
 
 	"github.com/Meland-Inc/service-xlsx-tool/src/common/excel"
@@ -15,26 +17,62 @@ import (
 
 var taskTableRows = make(map[int32]xlsxTable.TaskTableRow)
 
-func ParseTaskParams(v interface{}) (objs *xlsxTable.TaskObjectList, err error) {
-	iss, ok := v.([][]int)
-	if !ok {
-		return &xlsxTable.TaskObjectList{}, nil
+func intArrToTaskRowOption(optType proto.TaskOptionType, arr []int, isChance bool) (*xlsxTable.TaskRowOption, error) {
+	if len(arr) < 1 || (isChance && len(arr) < 2) {
+		return nil, fmt.Errorf("option invalid")
 	}
 
-	objs = &xlsxTable.TaskObjectList{}
-	for _, is := range iss {
-		if len(is) < 3 {
-			return nil, fmt.Errorf("invalid data")
-		}
-		paramList := xlsxTable.TaskObject{
-			Param1: int32(is[0]),
-			Param2: int32(is[1]),
-			Param3: int32(is[2]),
-		}
-		objs.ParamList = append(objs.ParamList, paramList)
-		objs.ChanceSum += paramList.Param3
+	opt := &xlsxTable.TaskRowOption{OptionType: optType}
+	if isChance {
+		opt.Chance = int32(arr[len(arr)-1])
 	}
-	return
+
+	for idx, value := range arr {
+		switch idx {
+		case 0:
+			opt.Param1 = int32(value)
+		case 1:
+			opt.Param2 = int32(value)
+		case 2:
+			opt.Param3 = int32(value)
+		case 3:
+			opt.Param4 = int32(value)
+		}
+	}
+
+	return opt, nil
+}
+
+func ParseTaskOptionsJson(id int32, js string, isChance bool) (optionList *xlsxTable.TaskRowOptionList, err error) {
+	if len(js) == 0 {
+		return nil, nil
+	}
+
+	if id < 1 {
+		return nil, fmt.Errorf("invalid task id[%d]", id)
+	}
+
+	xlsxOptions := &xlsxTable.TaskXlsxOptions{}
+	err = json.Unmarshal([]byte(js), xlsxOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	optionList = &xlsxTable.TaskRowOptionList{}
+	for _, option := range xlsxOptions.Options {
+		intArrArr := excel.ParseIntSliceSliceValue(option.Value)
+		for _, intArr := range intArrArr {
+			opt, err := intArrToTaskRowOption(option.OptionType, intArr, isChance)
+			if err != nil {
+				serviceLog.Error(err.Error())
+				continue
+			}
+			optionList.Options = append(optionList.Options, *opt)
+			optionList.ChanceSum += opt.Chance
+		}
+	}
+
+	return optionList, nil
 }
 
 func ParseTask(rows []map[string]interface{}) (err error) {
@@ -43,63 +81,42 @@ func ParseTask(rows []map[string]interface{}) (err error) {
 			continue
 		}
 		setting := xlsxTable.TaskTableRow{
-			Id:          excel.IntToInt32(row["id"]),
-			Level:       excel.IntToInt32(row["level"]),
-			Name:        excel.StringToString(row["name"]),
-			SubSystem:   excel.IntSliceToJsonStr(row["subSystem"]),
-			Kind:        excel.IntToInt32(row["Type"]),
-			RequestLand: excel.IntToInt32(row["requestLand"]),
-			RewardExp:   excel.IntToInt32(row["expReward"]),
-			RewardId:    excel.IntToInt32(row["itemReward"]),
-			Difficulty:  excel.IntToInt32(row["difficulty"]),
+			Id:         excel.IntToInt32(row["id"]),
+			Level:      excel.IntToInt32(row["level"]),
+			Name:       excel.StringToString(row["name"]),
+			SubSystem:  excel.IntSliceToJsonStr(row["subSystem"]),
+			RewardId:   excel.IntToInt32(row["itemReward"]),
+			RewardExp:  excel.IntToInt32(row["expReward"]),
+			Difficulty: excel.IntToInt32(row["difficulty"]),
 		}
 
-		if objs, err := ParseTaskParams(row["item"]); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetNeedItem(objs)
-			}
-		} else {
-			err = fmt.Errorf(" task.xlsx invalid item taskId[%v]", setting.Id)
+		// 解析designateOptions
+		designateOptionsJs := excel.StringToString(row["designateOptions"])
+		desOptList, err := ParseTaskOptionsJson(setting.Id, designateOptionsJs, false)
+		if err != nil {
+			err = fmt.Errorf(" Task.xlsx id[%v] designateOptions 配置错误", setting.Id)
+			serviceLog.Error(err.Error())
+			continue
+		}
+		if err = setting.SetDesignateOptions(desOptList); err != nil {
 			serviceLog.Error(err.Error())
 			continue
 		}
 
-		if objs, err := ParseTaskParams(row["useItem"]); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetUseItem(objs)
-			}
-		} else {
-			err = fmt.Errorf(" task.xlsx invalid useItem taskId[%v]", setting.Id)
+		// 解析designateOptions
+		chanceOptionsJs := excel.StringToString(row["chanceOptions"])
+		chaOptList, err := ParseTaskOptionsJson(setting.Id, chanceOptionsJs, true)
+		if err != nil {
+			err = fmt.Errorf(" Task.xlsx id[%v] chanceOptions 配置错误", setting.Id)
+			serviceLog.Error(err.Error())
+			continue
+		}
+		if err = setting.SetChanceOptions(chaOptList); err != nil {
 			serviceLog.Error(err.Error())
 			continue
 		}
 
-		if objs, err := ParseTaskParams(row["monster"]); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetKillMonster(objs)
-			}
-		} else {
-			err = fmt.Errorf(" task.xlsx invalid monster taskId[%v]", setting.Id)
-			serviceLog.Error(err.Error())
-			continue
-		}
-
-		if objs, err := ParseTaskParams(row["moveTo"]); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetTargetPos(objs)
-			}
-		} else {
-			err = fmt.Errorf(" task.xlsx invalid moveTo taskId[%v]", setting.Id)
-			serviceLog.Error(err.Error())
-			continue
-		}
-
-		if objs, err := ParseTaskParams(row["quiz"]); err == nil {
-			if len(objs.ParamList) > 0 {
-				setting.SetQuiz(objs)
-			}
-		} else {
-			err = fmt.Errorf(" task.xlsx invalid quiz taskId[%v]", setting.Id)
+		if err = setting.Check(); err != nil {
 			serviceLog.Error(err.Error())
 			continue
 		}

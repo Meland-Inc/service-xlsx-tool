@@ -37,29 +37,6 @@ func parseIntValue(raw string) int {
 	return int(i)
 }
 
-func parseIntSliceValue(raw string) (rv []int) {
-	if 0 == len(raw) {
-		return
-	}
-	for _, part := range strings.Split(raw, ",") {
-		rv = append(rv, parseIntValue(part))
-	}
-	return rv
-}
-
-func parseIntSliceSliceValue(raw string) (rv [][]int) {
-	if 0 == len(raw) {
-		return
-	}
-	for _, part := range strings.Split(raw, ";") {
-		if 0 == len(part) {
-			continue
-		}
-		rv = append(rv, parseIntSliceValue(part))
-	}
-	return rv
-}
-
 func parseStringValue(raw string) string {
 	return raw
 }
@@ -125,9 +102,9 @@ func parseValueWithType(raw, fieldname, fieldtype string) (interface{}, bool) {
 	case "int":
 		return parseIntValue(raw), true
 	case "int[]":
-		return parseIntSliceValue(raw), true
+		return ParseIntSliceValue(raw), true
 	case "int[][]":
-		return parseIntSliceSliceValue(raw), true
+		return ParseIntSliceSliceValue(raw), true
 	case "string":
 		return parseStringValue(raw), true
 	case "string[]":

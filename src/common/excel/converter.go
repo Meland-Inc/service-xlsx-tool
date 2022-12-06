@@ -243,3 +243,26 @@ func StringToStringSlice(v interface{}, sep string) (slice []string) {
 
 	return strings.Split(str, sep)
 }
+
+func ParseIntSliceValue(raw string) (rv []int) {
+	if 0 == len(raw) {
+		return
+	}
+	for _, part := range strings.Split(raw, ",") {
+		rv = append(rv, parseIntValue(part))
+	}
+	return rv
+}
+
+func ParseIntSliceSliceValue(raw string) (rv [][]int) {
+	if 0 == len(raw) {
+		return
+	}
+	for _, part := range strings.Split(raw, ";") {
+		if 0 == len(part) {
+			continue
+		}
+		rv = append(rv, ParseIntSliceValue(part))
+	}
+	return rv
+}

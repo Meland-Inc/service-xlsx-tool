@@ -7,8 +7,11 @@ set -e
 # git pull
 # git submodule update --init --recursive
 
-echo "------------  set xlsx tool environment variable --------------------------------"
 
+export XLSX_MODEL=export  ## export || make
+echo "-------------------------- begin ${XLSX_MODEL} xlsx data  --------------------------------"
+
+echo "------------  set xlsx tool environment variable --------------------------------"
 ## ---------------melandConfig----------------
 export MELAND_CONFIG_DB_HOST=192.168.50.15
 export MELAND_CONFIG_DB_USER=root
