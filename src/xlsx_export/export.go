@@ -44,6 +44,7 @@ func InitTables() {
 	RegisterTable("SlotLv.xlsx", ParseSlotLv, nil, SlotLvSaveToDB)
 	RegisterTable("Task.xlsx", ParseTask, nil, TaskSaveToDB)
 	RegisterTable("TaskList.xlsx", ParseTaskList, nil, TaskListSaveToDB)
+	RegisterTable("SceneArea.xlsx", ParseSceneArea, nil, SceneAreaSaveToDB)
 }
 
 func ParseTables(configDir string) (err error) {
