@@ -20,10 +20,10 @@ func ParseSceneArea(rows []map[string]interface{}) (err error) {
 		}
 
 		setting := xlsxTable.SceneAreaRow{
-			Id:   excel.IntToInt32(row["id"]),
-			Name: excel.StringToString(row["sceneName"]),
+			Id:        excel.IntToInt32(row["id"]),
+			Name:      excel.StringToString(row["sceneName"]),
+			SceneType: excel.StringToString(row["sceneType"]),
 		}
-
 		sceneAreaRows[setting.Id] = setting
 	}
 	return err
