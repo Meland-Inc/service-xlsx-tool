@@ -58,7 +58,7 @@ func GetTableDB(models []interface{}) (*gorm.DB, error) {
 func WriterToDB(db *gorm.DB, curUtc time.Time, pTypes interface{}, dataLength int, datas interface{}) {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		// 清空老的配置数据
-		err := tx.Where("created_at < ?", curUtc).Delete(pTypes).Error
+		err := tx.Where("created_at <= ?", curUtc).Delete(pTypes).Error
 		if err != nil {
 			return err
 		}
