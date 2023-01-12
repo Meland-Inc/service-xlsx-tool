@@ -25,7 +25,6 @@ func ParseTalentTree(rows []map[string]interface{}) (err error) {
 			IsTrunk:    excel.BoolToBool(row["isTrunk"]),
 			Layer:      excel.IntToInt32(row["layer"]),
 			LvLimit:    excel.IntToInt32(row["lvLimit"]),
-			Gains:      excel.IntToInt32(row["gains"]),
 		}
 		upgradeData := xlsxTable.TalentUpgradeData{
 			TalentTreeLv:  excel.IntToInt32(row["upgradeRequireTreeLv"]),
